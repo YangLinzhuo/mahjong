@@ -1,10 +1,19 @@
 from enum import Enum
 
+
 class HaiType(Enum):
     MANTSU = 'm'  # man -> m
     PINTSU = 'p'  # pin -> p
     SOUTSU = 's'  # sou -> s
     YAKU = 'z'   # yaku -> z
+
+
+HAITYPE_MAP = {
+    'm': HaiType.MANTSU,
+    'p': HaiType.PINTSU,
+    's': HaiType.SOUTSU,
+    'z': HaiType.YAKU
+}
 
 
 class Hai:
@@ -19,12 +28,13 @@ class Hai:
         """
         self.type: HaiType = hai_type
         self.val: int = val
+        self.used: bool = False
 
     def __lt__(self, other):
-        return (self.type < other.type) or (self.type == other.type and self.val < other.val)
+        return (self.type.value < other.type.value) or (self.type == other.type and self.val < other.val)
 
     def __gt__(self, other):
-        return (self.type > other.type) or (self.type == other.type and self.val > other.val)
+        return (self.type.value > other.type.value) or (self.type == other.type and self.val > other.val)
 
     def __eq__(self, other):
         return self.type == other.type and self.val == other.val
@@ -44,3 +54,13 @@ class Tehai:
         self.mongzen: list[Hai] = []    # initially 13 hai
         self.naki: list[Hai] = []       # initially 0
 
+    def parse_input(self, tehai: str):
+        from collections import deque
+        stack = deque()
+        for c in tehai:
+            if c.isnumeric():
+                stack.append(int(c))
+            else:
+                while len(stack):
+                    val = stack.pop()
+                    self.mongzen.append(Hai(HAITYPE_MAP[c], val))
